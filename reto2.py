@@ -129,7 +129,6 @@ explode = (0.1, 0, 0, 0,0,0)
 
 plt.pie(count, explode=explode, labels=count )
 
-plt.hist(count, bins=6, range=[0,255], color=(sRGBColor(25, 86, 150, True)))
 
 
 c=colors[0][0]
