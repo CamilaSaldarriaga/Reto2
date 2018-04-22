@@ -1,0 +1,164 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+                                                          % if you need a4paper
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
+                                                          % paper
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+
+
+% The following packages can be found on http:\\www.ctan.org
+\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{graphicx,subfigure}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+
+\title{\LARGE \bf
+Informe: Reto No. 2
+}
+
+%\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
+%         \thanks{*Use the $\backslash$thanks command to put information here}\\
+%         Faculty of Electrical Engineering, Mathematics and Computer Science\\
+%         University of Twente\\
+%         7500 AE Enschede, The Netherlands\\
+%         {\tt\small h.kwakernaak@autsubmit.com}}
+%         \hspace*{ 0.5 in}
+%         \parbox{3 in}{ \centering Pradeep Misra**
+%         \thanks{**The footnote marks may be inserted manually}\\
+%        Department of Electrical Engineering \\
+%         Wright State University\\
+%         Dayton, OH 45435, USA\\
+%         {\tt\small pmisra@cs.wright.edu}}
+%}
+
+\author{Maria Camila Saldarriaga Ortega% <-this % stops a space
+%\thanks{*This work was not supported by any organization}% <-this % stops a space
+%\thanks{$^{1}$H. Kwakernaak is with Faculty of Electrical Engineering, Mathematics and Computer Science,
+ %       University of Twente, 7500 AE Enschede, The Netherlands
+  %      {\tt\small h.kwakernaak at papercept.net}}%
+%\thanks{$^{2}$P. Misra is with the Department of Electrical Engineering, Wright State University,
+ %       Dayton, OH 45435, USA
+  %{\tt\small p.misra at ieee.org}}%
+}
+
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{INTRODUCCIÓN}
+
+Actualmente los algoritmos de clasificación juegan un papel muy importante en la industria e investigación, es por esto que se realizó un ejercicio de aprendizaje que consiste en identificar y clasificar el número de m\&m de una imagen según el color.
+
+\section{METODOLOGÍA}
+
+\subsection{Configuración}
+
+Inicialmente se definieron manualmente el número de grupos en los cuales se iban a clasificar los m\&m, en este caso son 6 colores, además se estableció un radio aproximado de los objetos a identificar. Posteriormente se carga la imagen original, que en este caso es la imagen que estaba en las espeificaciones del reto, se separan los canales RGB y luego de probar con varios filtros, se le aplica el "Median" ya que dió mejores resultados, luego se hace una binarización Otzu con el fin de diferenciar el fondo de los objetos a identificar; finalmente se vuelven a sumar los canales y se normaliza la imagen(ver figura \ref{fig:a} )
+
+\begin{figure}[H]
+\centering     %%% not \center
+\subfigure[]{\label{fig:a}\includegraphics[width=40mm]{2.png}}
+\subfigure[]{\label{fig:b}\includegraphics[width=40mm]{3.png}}
+\caption{a) Eliminación del ruido. b) Máximos locales.}
+\end{figure}
+
+\subsection{Preparación de la imagen}
+
+En esta etapa primero se remueve el ruido usando la operación morfológica "Open" (erosión y dilatación) y por último nuevamente dilatación. Luego por medio de una transformada de distacia se calcula la distacia de los centros de los objetos con el operador "transformada de distancia" en la figura \ref{fig:b} se puede observar que los centros de cada objeto resaltan, para separar los m\&m que estan juntos y con estas distancias se encuentran los máximos locales; como ya sabemos con certeza cual es el fondo y cuales son los objetos, se les asigna un valor diferente, en donde el fondo es cero y los bordes -1; se define la region de incertidumbre como la resta del fondo y las "semillas", que se hallaron usando el radio especificado en un principio (ver figura \ref{fig:c} y \ref{fig:d}). Finalmente se aplica la función "watershed" entre la imagen original y la que tiene los bordes identificados, esta función trata la imagen como una superficie topográfica, es decir, diferencia por colores cada valor, en la figura \ref{fig:e}. se observa como queda finalmente la imagen y se pueden ver los bordes muy definidos.
+
+\begin{figure}
+\centering     %%% not \center
+\subfigure[]{\label{fig:c}\includegraphics[width=40mm]{4.png}}
+\subfigure[]{\label{fig:d}\includegraphics[width=40mm]{5.png}}
+\caption{a) Semillas. b) Region de incertidumbre}
+\end{figure}
+
+\begin{figure}[H]
+\centering     %%% not \center
+\includegraphics[width=40mm]{Captura_de_pantalla_de_2018-04-22_12-22-14.png}
+\caption{Imagen despues de aplicar "watershed"}
+\label{fig:e}
+\end{figure}
+
+\subsection{Clasificación}
+
+Finalmente se cambia la imagen de RGB a HSV y se aplica la función "Reshape" para separar canales y se toman los canales: R, G, B, H, S y V para entrenar con el método "Kmeans", luego se hace la predicción, asignando valores a cada una de éstas según el color; usando "drawing" se verifica que segmentos son iguales y se comienza el conteo, que se almacena en la variable "Count". por último se genera la matriz con las coordenadas RGB de cada segmento, con el fin de usarlas para generar el resumen con un diagrama de torta.
+
+
+
+\section{RESULTADOS Y CONCLUSIONES}
+
+Se logró hacer la separación por colores de los m \&m, sin embargo, no fue posible generar el resumen con los colores correspondientes. En las siguientes figuras se observa el resultado:
+
+
+\begin{figure}[H]
+\centering     %%% not \center
+\subfigure[]{\label{fig:f}\includegraphics[width=50mm]{final.png}}
+\subfigure[]{\label{fig:g}\includegraphics[width=50mm]{pie.png}}
+\caption{a) m\&m clasificados. b) Resumen.}
+\end{figure}
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\begin{thebibliography}{99}
+
+\bibitem{c1} $https://docs.opencv.org/3.3.1/d3/db4/tutorial_py_watershed.html$
+ 
+
+
+\end{thebibliography}
+
+
+
+
+\end{document}
